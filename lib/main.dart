@@ -47,10 +47,15 @@ class _HomeState extends State<Home> {
     euroController.text = (real/euro).toStringAsFixed(2);
   }
   void _dolarChanged(String text){
-    print(text);
-    print(this.dolar);
+    double dolar = double.parse(text);
+    realController.text = (dolar * this.dolar).toStringAsFixed(2);
+    euroController.text = ((dolar * this.dolar) / euro).toStringAsFixed(2);
   }
-  void _euroChanged(String text){}
+  void _euroChanged(String text){
+    double euro = double.parse(text);
+    realController.text = (euro * this.euro).toStringAsFixed(2);
+    dolarController.text = ((euro * this.euro) / dolar).toStringAsFixed(2);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +65,16 @@ class _HomeState extends State<Home> {
         title: Text("\$ Conversor de Moedas \$"),
         backgroundColor: Colors.amber,
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              realController.text = "";
+              dolarController.text = "";
+              euroController.text = "";
+            },
+          )
+        ],
       ),
       body: FutureBuilder<Map>(
         future: getData(),
@@ -95,7 +110,7 @@ class _HomeState extends State<Home> {
                       Divider(),
                       buildTextField("Real", "R\$", realController, _realChanged),
                       Divider(),
-                      buildTextField("Dólar", "\$", dolarController, _dolarChanged),
+                      buildTextField("Dólar", "US\$", dolarController, _dolarChanged),
                       Divider(),
                       buildTextField("Euro", "€", euroController, _euroChanged)
                     ],
@@ -111,6 +126,7 @@ class _HomeState extends State<Home> {
 
 Widget buildTextField(String label, String prefix, TextEditingController controller, Function func) {
   return TextField(
+    controller: controller,
     decoration: InputDecoration(
       labelText: label,
       labelStyle: TextStyle(color: Colors.amber),
@@ -121,6 +137,6 @@ Widget buildTextField(String label, String prefix, TextEditingController control
       color: Colors.amber, fontSize: 25.0,
     ),
     onChanged: func,
-    keyboardType: TextInputType.number,
+    keyboardType: TextInputType.numberWithOptions(decimal: true),
   );
 }
